@@ -1,0 +1,4 @@
+name: ivp-post-types
+mainClass: io.collap.ivp.post_types.PostTypesModule
+dependencies:
+  - std-post

@@ -1,0 +1,26 @@
+//-
+  | Mandatory:
+  |   isThumbnail: boolean
+  |     Whether the mana curve should be generated as the thumbnail or normal version.
+  |   counts: List<Integer>
+  |     The amount of cards of the specific cost.
+  |   max: Float
+  |     The maximum count as a float.
+
+//- TODO: margin-right: 0px; for the last div (at count 7)
+
+div.mana_curve
+  div.mana_bars
+    each count, index in counts
+      maxBarHeight = 150
+      if isThumbnail
+        maxBarHeight = 60
+      height = (count / max) * maxBarHeight
+      style = ""
+      if index == counts.size() - 1
+        style = "margin-right: 0px" //- I CAN NOT PUT A SEMICOLON HERE...
+      div(style=style)
+        if !isThumbnail
+          span.mana_count= count
+        span.mana_bar_container
+          span.mana_bar(style="height:#{height}px;")
