@@ -1,0 +1,2 @@
+name: ivp-game-data
+mainClass: io.collap.ivp.game_data.GameDataModule
