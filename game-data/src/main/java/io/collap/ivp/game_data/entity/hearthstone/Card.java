@@ -13,7 +13,7 @@ public class Card extends io.collap.entity.Entity {
     private static final String CURRENT_PACKAGE = "io.collap.ivp.game_data.entity.hearthstone.";
 
     private String name;
-    private CardClass cardClass;
+    private HearthstoneClass hearthstoneClass;
     private Rarity rarity;
     private Type type;
     private Expansion expansion;
@@ -35,13 +35,13 @@ public class Card extends io.collap.entity.Entity {
 
     @Column(name = "class")
     @org.hibernate.annotations.Type(type = "PersistentEnum",
-            parameters = @Parameter(name = "type", value = CURRENT_PACKAGE + "CardClass"))
-    public CardClass getCardClass () {
-        return cardClass;
+            parameters = @Parameter(name = "type", value = CURRENT_PACKAGE + "HearthstoneClass"))
+    public HearthstoneClass getHearthstoneClass () {
+        return hearthstoneClass;
     }
 
-    public void setCardClass (CardClass cardClass) {
-        this.cardClass = cardClass;
+    public void setHearthstoneClass (HearthstoneClass hearthstoneClass) {
+        this.hearthstoneClass = hearthstoneClass;
     }
 
     @org.hibernate.annotations.Type(type = "PersistentEnum",

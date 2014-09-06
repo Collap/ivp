@@ -1,0 +1,20 @@
+; The data of the current deck!
+in DeckData data
+
+; The list of possible budgets.
+in List<DeckBudget> budgets
+
+; The list of possible classes.
+in List<HearthstoneClass> classes
+
+p
+  label(for 'class'): Class:
+  @EnumSelect (name 'class', values classes, selectedValue data.deckClass)
+
+p
+  label(for 'budget'): Budget:
+  @EnumSelect (name 'budget', values budgets, selectedValue data.budget)
+
+p
+  label(for 'deckUrl'): Deck URL:
+  input(type 'text', name 'deckUrl', value data.deckUrl)

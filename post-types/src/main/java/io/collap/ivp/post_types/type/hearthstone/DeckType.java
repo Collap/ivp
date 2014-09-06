@@ -1,32 +1,71 @@
 package io.collap.ivp.post_types.type.hearthstone;
 
 import io.collap.Collap;
+import io.collap.bryg.environment.Environment;
+import io.collap.bryg.model.Model;
 import io.collap.controller.communication.Request;
 import io.collap.entity.Entity;
-import io.collap.ivp.post_types.DeckBudget;
+import io.collap.ivp.game_data.entity.hearthstone.Card;
+import io.collap.ivp.game_data.entity.hearthstone.HearthstoneClass;
+import io.collap.ivp.post_types.Deck;
+import io.collap.ivp.post_types.entity.hearthstone.DeckBudget;
 import io.collap.ivp.post_types.entity.hearthstone.DeckData;
 import io.collap.std.post.entity.Post;
 import io.collap.std.post.type.BasicType;
-import io.collap.template.TemplateRenderer;
+import org.hibernate.Session;
 
 import javax.annotation.Nullable;
-import java.io.IOException;
+import java.io.StringWriter;
 import java.util.*;
 
 public class DeckType extends BasicType {
 
-    private TemplateRenderer renderer;
+    /**
+     * The maximum cost to be shown in the mana curve.
+     * The current value means that all cards starting
+     * at or above a cost of 7 are counted towards the
+     * 7+ cost category.
+     */
+    private static final int MAXIMUM_COST = 7;
 
-    public DeckType (Collap collap, TemplateRenderer renderer) {
+    private class CardStack {
+        private Card card;
+        private int amount;
+
+        private CardStack (Card card, int amount) {
+            this.card = card;
+            this.amount = amount;
+        }
+
+        public Card getCard () {
+            return card;
+        }
+
+        public int getAmount () {
+            return amount;
+        }
+    }
+
+    private Environment bryg;
+
+    public DeckType (Collap collap, Environment bryg) {
         super (collap);
-        this.renderer = renderer;
+        this.bryg = bryg;
     }
 
     @Override
     protected void update (Entity entity, Request request) {
         DeckData data = (DeckData) entity;
-        data.setBudget (DeckBudget.valueOf (request.getStringParameter ("budget")));
+
+        DeckBudget budget = DeckBudget.valueOf (request.getStringParameter ("budget"));
+        data.setBudget (budget);
         data.setDeckUrl (request.getStringParameter ("deckUrl"));
+
+        HearthstoneClass deckClass = HearthstoneClass.valueOf (request.getStringParameter ("class"));
+        if (deckClass == HearthstoneClass.neutral) {
+            throw new IllegalArgumentException ("There are no neutral decks.");
+        }
+        data.setDeckClass (deckClass);
     }
 
     @Override
@@ -36,41 +75,64 @@ public class DeckType extends BasicType {
             data = DeckData.createTransientDeckData ();
         }
 
-        Map<String, Object> model = new HashMap<> ();
-        model.put ("data", data);
-        model.put ("budgets", DeckBudget.valueList);
-        try {
-            return renderer.renderTemplate ("hearthstone/deck/Editor.jade", model);
-        } catch (IOException e) {
-            throw new RuntimeException ("Deck/Editor template not found!", e);
-        }
+        Model model = bryg.createModel ();
+        model.setVariable ("data", data);
+        model.setVariable ("budgets", DeckBudget.valueList);
+        model.setVariable ("classes", HearthstoneClass.playerClasses);
+
+        StringWriter writer = new StringWriter ();
+        bryg.getTemplate ("hearthstone.deck.Editor").render (writer, model);
+        return writer.toString ();
     }
 
     @Override
     protected void compile (Entity entity, Post post) {
+        // TODO: Only fetch the costs, in one query.
         DeckData data = (DeckData) entity;
 
-        /* Mana curve. */
-        // TODO: Parse the card ids.
-        List<Integer> counts = new ArrayList<> ();
-        counts.add (0);
-        counts.add (4);
-        counts.add (6);
-        counts.add (4);
-        counts.add (10);
-        counts.add (2);
-        counts.add (1);
-        counts.add (3);
-        int max = Collections.max (counts);
-        Map<String, Object> model = new HashMap<> ();
-        model.put ("isThumbnail", false);
-        model.put ("counts", counts);
-        model.put ("max", (float) max);
-        try {
-            post.setContent (renderer.renderTemplate ("hearthstone/deck/ManaCurve", model));
-        } catch (IOException e) {
-            post.setContent ("Mana curve template not found!");
+        String url = data.getDeckUrl ();
+        String deckDef = url.substring (url.lastIndexOf ('#') + 1);
+
+        Session session = collap.getSessionFactory ().getCurrentSession ();
+
+        List<CardStack> stacks = new ArrayList<> ();
+        String[] stackDefs = deckDef.split (";");
+        for (String stackDef : stackDefs) {
+            String[] tokens = stackDef.split (":");
+            if (tokens.length != 2) continue;
+
+            long cardId = Long.parseLong (tokens[0]);
+            Card card = (Card) session.get (Card.class, cardId);
+            int amount = Integer.parseInt (tokens[1]);
+            stacks.add (new CardStack (card, amount));
         }
+
+        /* Mana curve. */
+        List<Integer> counts = new ArrayList<> (Collections.nCopies (MAXIMUM_COST + 1, 0));
+
+        for (CardStack stack : stacks) {
+            int cost = stack.getCard ().getCost ();
+            if (cost > 7) cost = 7;
+            int currentCount = counts.get (cost);
+            counts.set (cost, currentCount + stack.amount);
+        }
+
+        int max = Collections.max (counts);
+        Model model = bryg.createModel ();
+        model.setVariable ("isThumbnail", false);
+        model.setVariable ("counts", counts);
+        model.setVariable ("max", max);
+
+        StringWriter writer = new StringWriter ();
+        bryg.getTemplate ("hearthstone.deck.ManaCurve").render (writer, model);
+        post.setContent (writer.toString ());
+
+        /* Generate title. */
+        post.setTitle ("Title needed");
+    }
+
+    private String generateTitle (Deck deck) {
+        throw new UnsupportedOperationException ("Not yet implemented.");
     }
 
     @Override

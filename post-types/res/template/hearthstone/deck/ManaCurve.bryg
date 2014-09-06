@@ -1,0 +1,24 @@
+; Whether the mana curve should be generated as the thumbnail or normal version.
+in boolean isThumbnail
+
+; The amount of cards of the specific cost (Index 0 to x, where cost is x).
+in List<Integer> counts
+
+; The maximum count.
+in int max
+
+div(class 'mana_curve')
+  div(class 'mana_bars')
+    each count, index in counts
+      mut maxBarHeight = 150
+      if isThumbnail
+        maxBarHeight = 60
+      val height = (count / (float) max) * maxBarHeight
+      mut style = ''
+      if index == counts.size () - 1
+        style = 'margin-right: 0px;'
+      div(style style)
+        if not isThumbnail
+          span(class 'mana_count') count
+        span(class 'mana_bar_container')
+          span(class 'mana_bar', style 'height: #{height}px;')

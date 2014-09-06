@@ -1,10 +1,10 @@
 package io.collap.ivp.post_types.entity.hearthstone;
 
-import io.collap.ivp.post_types.DeckBudget;
+import io.collap.ivp.game_data.entity.hearthstone.HearthstoneClass;
+import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
 @Entity
@@ -12,6 +12,7 @@ import javax.persistence.Table;
 public class DeckData extends io.collap.entity.Entity {
 
     private DeckBudget budget;
+    private HearthstoneClass deckClass;
     private String deckUrl;
 
     public DeckData () {
@@ -23,16 +24,28 @@ public class DeckData extends io.collap.entity.Entity {
         data.setId (-1L);
         data.setBudget (DeckBudget.basic);
         data.setDeckUrl ("");
+        data.setDeckClass (HearthstoneClass.neutral);
         return data;
     }
 
-    @Enumerated(EnumType.STRING)
+    @Type(type = "PersistentEnum",
+          parameters = @Parameter(name = "type", value = "io.collap.ivp.post_types.entity.hearthstone.DeckBudget"))
     public DeckBudget getBudget () {
         return budget;
     }
 
     public void setBudget (DeckBudget budget) {
         this.budget = budget;
+    }
+
+    @Type(type = "PersistentEnum",
+            parameters = @Parameter(name = "type", value = "io.collap.ivp.game_data.entity.hearthstone.HearthstoneClass"))
+    public HearthstoneClass getDeckClass () {
+        return deckClass;
+    }
+
+    public void setDeckClass (HearthstoneClass deckClass) {
+        this.deckClass = deckClass;
     }
 
     public String getDeckUrl () {

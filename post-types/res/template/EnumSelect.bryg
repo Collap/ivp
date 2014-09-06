@@ -1,0 +1,16 @@
+; The name of the select.
+in String name
+
+; A list of enum values.
+in List<Enum> values
+
+; The currently selected value, may be null.
+opt Enum selectedValue
+
+select(name name)
+  each value in values
+    ; This "double code" situation will be solved by parameter predicates.
+    if selectedValue === value
+      option(selected '', value value.name ()) value.name ()
+    else
+      option(value value.name ()) value.name ()

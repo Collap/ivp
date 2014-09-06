@@ -2,7 +2,9 @@ archivesBaseName = 'ivp-post-types'
 version = '0.1.1'
 
 dependencies {
+    compile project (':game-data')
     compile 'collap-std:collap-std-post:0.1.1'
+    compile 'collap-std:collap-std-format:0.1.1'
 }
 
 jar {

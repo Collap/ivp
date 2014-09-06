@@ -1,0 +1,7 @@
+in Deck deck
+
+val purpose =:
+  it is called legendary because it utilises any number of required Legendary cards.
+  This deck is designed to help you reach the top of the rankings (and possibly even Legend rank).
+
+@hearthstone.deck.budget.Introduction (deck deck, purpose purpose)

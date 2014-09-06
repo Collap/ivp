@@ -9,6 +9,9 @@ import org.hibernate.cfg.Configuration;
 
 public class GameDataModule extends Module {
 
+    public static final String VERSION = "0.1.1";
+    public static final String ARTIFACT_NAME = "ivp-game-data-" + VERSION;
+
     @Override
     public void initialize () {
         Dispatcher gameData = new Dispatcher (collap);
