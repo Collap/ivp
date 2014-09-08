@@ -22,9 +22,9 @@ public class CardStackComparator implements Comparator<CardStack> {
             int o1 = card1.getType ().ordinal ();
             int o2 = card2.getType ().ordinal ();
             if (o1 < o2) {
-                return 1;
-            }else if (o1 > o2) {
                 return -1;
+            }else if (o1 > o2) {
+                return 1;
             }
         }
 
