@@ -14,13 +14,9 @@ public class GameDataModule extends Module {
 
     @Override
     public void initialize () {
-        Dispatcher gameData = new Dispatcher (collap);
-
         Dispatcher hs = new Dispatcher (collap);
-        hs.registerControllerFactory ("get", new ProviderControllerFactory (GetCard.class, this));
-        gameData.registerDispatcher ("hs", hs);
-
-        collap.getRootDispatcher ().registerDispatcher ("game-data", gameData);
+        hs.registerControllerFactory ("card", new ProviderControllerFactory (GetCard.class, this));
+        collap.getRootDispatcher ().registerDispatcher ("hs", hs);
     }
 
     @Override
