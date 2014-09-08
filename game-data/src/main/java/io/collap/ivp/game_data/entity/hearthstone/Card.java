@@ -5,6 +5,7 @@ import org.hibernate.annotations.Parameter;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "game_data_hs_cards")
@@ -24,6 +25,8 @@ public class Card extends io.collap.entity.Entity {
 
     private Boolean isFree;
     private Boolean isToken;
+
+    private int dustCost = -1;
 
     public String getName () {
         return name;
@@ -112,6 +115,29 @@ public class Card extends io.collap.entity.Entity {
 
     public void setIsToken (Boolean isToken) {
         this.isToken = isToken;
+    }
+
+    /**
+     * Object must be loaded before this method is called.
+     * A session must be open!
+     */
+    @Transient
+    public int getDustCost () {
+        if (dustCost == -1) {
+            if (getExpansion () == Expansion.naxxramas || getIsFree ()) {
+                dustCost = 0;
+            }else {
+                switch (getRarity ()) {
+                    case basic: dustCost = 0; break;
+                    case common: dustCost = 40; break;
+                    case rare: dustCost = 100; break;
+                    case epic: dustCost = 400; break;
+                    case legendary: dustCost = 1600; break;
+                }
+            }
+        }
+
+        return dustCost;
     }
 
 }
