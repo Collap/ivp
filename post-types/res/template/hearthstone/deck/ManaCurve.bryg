@@ -7,6 +7,7 @@ in List<Integer> counts
 ; The maximum count.
 in int max
 
+h2: Mana Curve
 div(class 'mana_curve')
   div(class 'mana_bars')
     each count, index in counts
