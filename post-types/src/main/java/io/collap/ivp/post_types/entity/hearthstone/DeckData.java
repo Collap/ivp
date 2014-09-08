@@ -13,6 +13,7 @@ public class DeckData extends io.collap.entity.Entity {
 
     private DeckBudget budget;
     private HearthstoneClass deckClass;
+    private String playstyle;
     private String deckUrl;
 
     public DeckData () {
@@ -23,8 +24,9 @@ public class DeckData extends io.collap.entity.Entity {
         DeckData data = new DeckData ();
         data.setId (-1L);
         data.setBudget (DeckBudget.basic);
-        data.setDeckUrl ("");
         data.setDeckClass (HearthstoneClass.neutral);
+        data.setPlaystyle ("");
+        data.setDeckUrl ("");
         return data;
     }
 
@@ -46,6 +48,14 @@ public class DeckData extends io.collap.entity.Entity {
 
     public void setDeckClass (HearthstoneClass deckClass) {
         this.deckClass = deckClass;
+    }
+
+    public String getPlaystyle () {
+        return playstyle;
+    }
+
+    public void setPlaystyle (String playstyle) {
+        this.playstyle = playstyle;
     }
 
     public String getDeckUrl () {

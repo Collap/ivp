@@ -16,5 +16,9 @@ p
   @EnumSelect (name 'budget', values budgets, selectedValue data.budget)
 
 p
+  label(for 'playstyle'): Playstyle:
+  input(type 'text', name 'playstyle', value data.playstyle)
+
+p
   label(for 'deckUrl'): Deck URL:
   input(type 'text', name 'deckUrl', value data.deckUrl)
