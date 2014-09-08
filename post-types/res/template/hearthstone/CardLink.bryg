@@ -1,0 +1,5 @@
+in Card card
+
+a(class 'hearthstone_tooltip_link hearthstone_rarity_' + card.rarity.name (),
+  data-tooltip-href 'http://www.hearthpwn.com/cards/' + card.id,
+  href basePath + 'hs/card/' + card.id) card.name

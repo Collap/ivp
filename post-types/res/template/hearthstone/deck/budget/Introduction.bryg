@@ -2,6 +2,6 @@ in Deck deck
 in String purpose
 
 p:
-  On this page, you will find a \{deck.introductionName}.
-  It costs \{format.groupDigits (deck.cost)} Arcane Dust to make (counting common cards)
+  On this page, you will find a \{deck.introductionTitle}.
+  It costs \{format.groupDigits (deck.dustCost)} Arcane Dust to make (counting common cards)
   and \{purpose}

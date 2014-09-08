@@ -1,12 +1,13 @@
 package io.collap.ivp.post_types.type.hearthstone;
 
 import io.collap.Collap;
+import io.collap.bryg.Template;
 import io.collap.bryg.environment.Environment;
 import io.collap.bryg.model.Model;
 import io.collap.controller.communication.Request;
 import io.collap.entity.Entity;
-import io.collap.ivp.game_data.entity.hearthstone.Card;
 import io.collap.ivp.game_data.entity.hearthstone.HearthstoneClass;
+import io.collap.ivp.post_types.CardStack;
 import io.collap.ivp.post_types.Deck;
 import io.collap.ivp.post_types.entity.hearthstone.DeckBudget;
 import io.collap.ivp.post_types.entity.hearthstone.DeckData;
@@ -28,24 +29,6 @@ public class DeckType extends BasicType {
      */
     private static final int MAXIMUM_COST = 7;
 
-    private class CardStack {
-        private Card card;
-        private int amount;
-
-        private CardStack (Card card, int amount) {
-            this.card = card;
-            this.amount = amount;
-        }
-
-        public Card getCard () {
-            return card;
-        }
-
-        public int getAmount () {
-            return amount;
-        }
-    }
-
     private Environment bryg;
 
     public DeckType (Collap collap, Environment bryg) {
@@ -59,13 +42,16 @@ public class DeckType extends BasicType {
 
         DeckBudget budget = DeckBudget.valueOf (request.getStringParameter ("budget"));
         data.setBudget (budget);
-        data.setDeckUrl (request.getStringParameter ("deckUrl"));
 
         HearthstoneClass deckClass = HearthstoneClass.valueOf (request.getStringParameter ("class"));
         if (deckClass == HearthstoneClass.neutral) {
             throw new IllegalArgumentException ("There are no neutral decks.");
         }
         data.setDeckClass (deckClass);
+
+        data.setPlaystyle (request.getStringParameter ("playstyle"));
+
+        data.setDeckUrl (request.getStringParameter ("deckUrl"));
     }
 
     @Override
@@ -87,34 +73,34 @@ public class DeckType extends BasicType {
 
     @Override
     protected void compile (Entity entity, Post post) {
-        // TODO: Only fetch the costs, in one query.
         DeckData data = (DeckData) entity;
-
-        String url = data.getDeckUrl ();
-        String deckDef = url.substring (url.lastIndexOf ('#') + 1);
 
         Session session = collap.getSessionFactory ().getCurrentSession ();
 
-        List<CardStack> stacks = new ArrayList<> ();
-        String[] stackDefs = deckDef.split (";");
-        for (String stackDef : stackDefs) {
-            String[] tokens = stackDef.split (":");
-            if (tokens.length != 2) continue;
+        Deck deck = new Deck (data, session);
 
-            long cardId = Long.parseLong (tokens[0]);
-            Card card = (Card) session.get (Card.class, cardId);
-            int amount = Integer.parseInt (tokens[1]);
-            stacks.add (new CardStack (card, amount));
-        }
+        StringWriter writer = new StringWriter ();
+
+        /* Introduction. */
+        writer.write ("<h1>Deck</h1>");
+
+        Model deckModel = bryg.createModel ();
+        deckModel.setVariable ("deck", deck);
+
+        Template template = bryg.getTemplate ("hearthstone.deck.budget." + data.getBudget ().name ());
+        template.render (writer, deckModel);
+
+        /* Card list. */
+        bryg.getTemplate ("hearthstone.deck.CardList").render (writer, deckModel);
 
         /* Mana curve. */
         List<Integer> counts = new ArrayList<> (Collections.nCopies (MAXIMUM_COST + 1, 0));
 
-        for (CardStack stack : stacks) {
+        for (CardStack stack : deck.getStacks ()) {
             int cost = stack.getCard ().getCost ();
             if (cost > 7) cost = 7;
             int currentCount = counts.get (cost);
-            counts.set (cost, currentCount + stack.amount);
+            counts.set (cost, currentCount + stack.getAmount ());
         }
 
         int max = Collections.max (counts);
@@ -122,17 +108,11 @@ public class DeckType extends BasicType {
         model.setVariable ("isThumbnail", false);
         model.setVariable ("counts", counts);
         model.setVariable ("max", max);
-
-        StringWriter writer = new StringWriter ();
         bryg.getTemplate ("hearthstone.deck.ManaCurve").render (writer, model);
+
         post.setContent (writer.toString ());
 
-        /* Generate title. */
-        post.setTitle ("Title needed");
-    }
-
-    private String generateTitle (Deck deck) {
-        throw new UnsupportedOperationException ("Not yet implemented.");
+        post.setTitle (deck.getTitle ());
     }
 
     @Override

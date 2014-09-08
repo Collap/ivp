@@ -1,0 +1,7 @@
+in Deck deck
+
+ul
+  each CardStack stack in deck.stacks
+    li
+      stack.amount + 'x '
+      @hearthstone.CardLink (card stack.card)
