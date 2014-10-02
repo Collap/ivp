@@ -9,8 +9,4 @@ opt Enum selectedValue
 
 select(name name)
   each value in values
-    ; This "double code" situation will be solved by parameter predicates.
-    if selectedValue === value
-      option(selected '', value value.name ()) value.name ()
-    else
-      option(value value.name ()) value.name ()
+    option(value value.name (), selected '' if selectedValue === value) value.name ()

@@ -15,10 +15,7 @@ div(class 'mana_curve')
       if isThumbnail
         maxBarHeight = 60
       val height = (count / (float) max) * maxBarHeight
-      mut style = ''
-      if index == counts.size () - 1
-        style = 'margin-right: 0px;'
-      div(style style)
+      div(style 'margin-right: 0px;' if index == counts.size () - 1)
         if not isThumbnail
           span(class 'mana_count') count
         span(class 'mana_bar_container')
