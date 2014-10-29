@@ -8,7 +8,5 @@ dependencies {
 }
 
 jar {
-    manifest {
-        attributes 'Implementation-Title': 'ivp-' + archivesBaseName, 'Implementation-Version': version
-    }
+    baseName = 'ivp-post-types'
 }

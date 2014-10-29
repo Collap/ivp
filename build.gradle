@@ -10,7 +10,7 @@ subprojects {
     apply plugin: 'maven'
     apply plugin: 'java'
     apply plugin: 'idea'
-	
+    
     sourceCompatibility = 1.7
 
     group = 'io.collap.ivp'
@@ -34,7 +34,7 @@ subprojects {
     }
 
     jar {
-    	destinationDir = file ("$rootDir/../module")
+        destinationDir = file ("$rootDir/../module")
         from ('res') {
             into ('/resource/')
         }

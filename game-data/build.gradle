@@ -1,12 +1,6 @@
 archivesBaseName = 'game-data'
 version = '0.1.1'
 
-dependencies {
-
-}
-
 jar {
-    manifest {
-        attributes 'Implementation-Title': 'ivp-' + archivesBaseName, 'Implementation-Version': version
-    }
+    baseName = 'ivp-game-data'
 }
