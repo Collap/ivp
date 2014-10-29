@@ -1,9 +1,10 @@
 package io.collap.ivp.post_types.type.hearthstone;
 
 import io.collap.Collap;
-import io.collap.bryg.Template;
 import io.collap.bryg.environment.Environment;
+import io.collap.bryg.model.BasicModel;
 import io.collap.bryg.model.Model;
+import io.collap.bryg.template.Template;
 import io.collap.controller.communication.Request;
 import io.collap.entity.Entity;
 import io.collap.ivp.game_data.entity.hearthstone.HearthstoneClass;
@@ -16,6 +17,7 @@ import io.collap.std.post.type.BasicType;
 import org.hibernate.Session;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.util.*;
 
@@ -55,13 +57,13 @@ public class DeckType extends BasicType {
     }
 
     @Override
-    protected String getEditor (@Nullable Entity entity) {
+    protected String getEditor (@Nullable Entity entity) throws IOException {
         DeckData data = (DeckData) entity;
         if (data == null) {
             data = DeckData.createTransientDeckData ();
         }
 
-        Model model = bryg.createModel ();
+        Model model = new BasicModel ();
         model.setVariable ("data", data);
         model.setVariable ("budgets", DeckBudget.valueList);
         model.setVariable ("classes", HearthstoneClass.playerClasses);
@@ -72,7 +74,7 @@ public class DeckType extends BasicType {
     }
 
     @Override
-    protected void compile (Entity entity, Post post) {
+    protected void compile (Entity entity, Post post) throws IOException {
         DeckData data = (DeckData) entity;
 
         Session session = collap.getSessionFactory ().getCurrentSession ();
@@ -84,7 +86,7 @@ public class DeckType extends BasicType {
         /* Introduction. */
         writer.write ("<h1>Deck</h1>");
 
-        Model deckModel = bryg.createModel ();
+        Model deckModel = new BasicModel ();
         deckModel.setVariable ("deck", deck);
 
         Template template = bryg.getTemplate ("hearthstone.deck.budget." + data.getBudget ().name ());
@@ -104,7 +106,7 @@ public class DeckType extends BasicType {
         }
 
         int max = Collections.max (counts);
-        Model model = bryg.createModel ();
+        Model model = new BasicModel ();
         model.setVariable ("isThumbnail", false);
         model.setVariable ("counts", counts);
         model.setVariable ("max", max);

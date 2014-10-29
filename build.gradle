@@ -13,6 +13,8 @@ subprojects {
 	
     sourceCompatibility = 1.7
 
+    group = 'io.collap.ivp'
+
     repositories {
         mavenCentral ()
         mavenLocal ()
@@ -23,7 +25,7 @@ subprojects {
     }
 
     dependencies {
-        compile 'collap-core:collap-api:0.1.1'
+        compile 'io.collap:api:0.1.1'
     }
 
     task copyDependencies (type: Copy) {
